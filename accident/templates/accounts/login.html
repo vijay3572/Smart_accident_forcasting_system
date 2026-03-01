@@ -96,9 +96,11 @@ h2 {
 </style>
 
 <!-- BACKGROUND VIDEO -->
-<video autoplay muted loop class="video-bg">
-<source src="/static/videos/carrace.mp4" type="video/mp4"></video>
+{% load static %}
 
+<video autoplay muted loop playsinline class="video-bg">
+    <source src="{% static 'videos/carrace.mp4' %}" type="video/mp4">
+</video>  
 <div class="row justify-content-center">
   <div class="col-md-5">
     <div class="glass-card">
