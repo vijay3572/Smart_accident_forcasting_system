@@ -6,6 +6,14 @@ from django.contrib import messages
 from .forms import SignupForm, LoginForm, AccidentReportForm
 from .models import AccidentReport, Feedback, Contact
 
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+
+from .forms import SignupForm, LoginForm
+
+
 # =======================
 # HOME PAGE
 # =======================
@@ -17,15 +25,22 @@ def home(request):
 # SIGNUP VIEW
 # =======================
 def signup_view(request):
+    if request.user.is_authenticated:
+        return redirect("accounts:dashboard")
+
     if request.method == "POST":
         form = SignupForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save()  # ✅ password hashed + details saved
+
             messages.success(
                 request,
-                f"Account created successfully! Your User ID: {user.id}"
+                f"Account created successfully! Your User ID: {user.id}. Please login."
             )
-            return redirect("accounts:signup")
+            # ✅ IMPORTANT: after signup go to login page
+            return redirect("accounts:login")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = SignupForm()
 
@@ -36,20 +51,20 @@ def signup_view(request):
 # LOGIN VIEW
 # =======================
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("accounts:dashboard")
+
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
-
         if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
+            # ✅ AuthenticationForm already authenticated the user
+            user = form.get_user()
+            login(request, user)  # ✅ session set
 
-            user = authenticate(request, username=username, password=password)
-
-            if user is not None:
-                login(request, user)
-                return redirect("accounts:dashboard")   # ✅ Correct redirect
-            else:
-                messages.error(request, "Invalid username or password")
+            messages.success(request, "Login successful!")
+            return redirect("accounts:dashboard")
+        else:
+            messages.error(request, "Invalid username or password")
     else:
         form = LoginForm()
 
@@ -61,17 +76,16 @@ def login_view(request):
 # =======================
 def logout_view(request):
     logout(request)
+    messages.info(request, "Logged out successfully.")
     return redirect("accounts:login")
 
 
 # =======================
 # DASHBOARD
 # =======================
-@login_required
+@login_required(login_url="accounts:login")
 def dashboard_view(request):
     return render(request, "accounts/dashboard.html")
-
-
 # =======================
 # SEARCH LOCATION
 # =======================
