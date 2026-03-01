@@ -8,9 +8,7 @@ from pathlib import Path
 import os
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # =========================
 # SECURITY
@@ -22,16 +20,13 @@ SECRET_KEY = os.getenv(
 
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# ALLOWED_HOSTS="smart-accident-forcasting-system.onrender.com"
+# Example: ALLOWED_HOSTS=smart-accident-forcasting-system.onrender.com
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "*").split(",") if h.strip()]
 
-# CSRF (Render domain https)
-# Set in Render env:
-# CSRF_TRUSTED_ORIGINS=https://smart-accident-forcasting-system.onrender.com
+# Example: CSRF_TRUSTED_ORIGINS=https://smart-accident-forcasting-system.onrender.com
 CSRF_TRUSTED_ORIGINS = [
     o.strip() for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()
 ]
-
 
 # =========================
 # APPLICATIONS
@@ -46,14 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-
 # =========================
 # MIDDLEWARE
 # =========================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # ✅ Serve static files on Render (recommended)
+    # Serve static files on Render
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -63,7 +57,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 
 ROOT_URLCONF = 'Roadrisk.urls'
 
@@ -84,13 +77,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Roadrisk.wsgi.application'
 
-
 # =========================
 # DATABASE
 # =========================
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
+    # Render / Production
     DATABASES = {
         "default": dj_database_url.parse(
             DATABASE_URL,
@@ -98,10 +91,10 @@ if DATABASE_URL:
             ssl_require=True
         )
     }
-
-    # ✅ Force sslmode=require for psycopg2
+    # Force SSL mode for psycopg2
     DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 else:
+    # Local development (your laptop)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -113,7 +106,6 @@ else:
         }
     }
 
-
 # =========================
 # PASSWORD VALIDATION
 # =========================
@@ -124,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
 # =========================
 # INTERNATIONALIZATION
 # =========================
@@ -133,7 +124,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
 # =========================
 # STATIC & MEDIA
 # =========================
@@ -141,12 +131,10 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# ✅ whitenoise storage (optional but good)
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-
 
 # =========================
 # AUTH
@@ -158,7 +146,6 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'accounts:login'
-
 
 # =========================
 # DEFAULT PK
