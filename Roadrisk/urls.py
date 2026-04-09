@@ -17,18 +17,16 @@ Including another URLconf
 # core/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from accident import views as accounts_views  # ✅ works only if app folder is at same level as manage.py
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include(('accident.urls', 'accident'), namespace='accident')),
-    path('dashboard/', accounts_views.dashboard_view, name='dashboard'),
-    path('',include('accident.urls')),
-]
+from accident import views as accounts_views
 from django.conf import settings
 from django.conf.urls.static import static
 
-
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include(('accident.urls', 'accounts'), namespace='accounts')),
+    path('dashboard/', accounts_views.dashboard_view, name='dashboard'),
+    path('', include('accident.urls')),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
